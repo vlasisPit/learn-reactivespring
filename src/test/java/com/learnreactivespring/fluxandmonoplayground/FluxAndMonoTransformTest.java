@@ -2,6 +2,7 @@ package com.learnreactivespring.fluxandmonoplayground;
 
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
 import reactor.test.StepVerifier;
 
 import java.util.Arrays;
@@ -54,6 +55,89 @@ public class FluxAndMonoTransformTest {
 
         StepVerifier.create(namesFlux)
                 .expectNext("JENNY")
+                .verifyComplete();
+    }
+
+    /**
+     * Flatmap is necessary if you want to call a DB or external service for each and every element
+     * and the response will be a flux (a publisher) also s -> Flux<String>
+     */
+    @Test
+    public void transformUsingFlatMap() {
+        Flux<String> stringFlux = Flux.fromIterable(Arrays.asList("A", "B", "C", "D", "E", "F"))
+                .flatMap(s -> {
+                    return Flux.fromIterable(convertToList(s));     //A -> List[A, newValue], B -> List[B, newValue]
+                })      //simulate a call to a service or DB
+                .log();
+
+        StepVerifier.create(stringFlux)
+                .expectNextCount(12)
+                .verifyComplete();
+    }
+
+    private List<String> convertToList(String s) {
+        try {
+            Thread.sleep(1000);         //this is an external call. Wait for 1 second
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return Arrays.asList(s, "newValue");
+    }
+
+    /**
+     * This parallel execution does not maintain order
+     */
+    @Test
+    public void transformUsingFlatMap_usingParallel() {
+        Flux<String> stringFlux = Flux.fromIterable(Arrays.asList("A", "B", "C", "D", "E", "F"))
+                .window(2)  //pass 2 elements instead one by one and returns Flux<Flux<String>>
+                .flatMap(s -> {
+                   return s.map(this::convertToList)
+                           .subscribeOn(Schedulers.parallel())  //change a thread to another thread. All execution happens in parallel. returns a Flux<List<String>>
+                           .flatMap(Flux::fromIterable);        //Flux<String>
+                })
+                .log();
+
+        StepVerifier.create(stringFlux)
+                .expectNextCount(12)
+                .verifyComplete();
+    }
+
+    /**
+     * concatMap maintains order but it needs 6 sec as the serial execution.
+     */
+    @Test
+    public void transformUsingFlatMap_usingParallel_maintain_order_butSlow() {
+        Flux<String> stringFlux = Flux.fromIterable(Arrays.asList("A", "B", "C", "D", "E", "F"))
+                .window(2)  //pass 2 elements instead one by one and returns Flux<Flux<String>>
+                .concatMap(s -> {       //same operation as flatMap but it maintains order
+                    return s.map(this::convertToList)
+                            .subscribeOn(Schedulers.parallel())  //change a thread to another thread. All execution happens in parallel. returns a Flux<List<String>>
+                            .flatMap(Flux::fromIterable);        //Flux<String>
+                })
+                .log();
+
+        StepVerifier.create(stringFlux)
+                .expectNextCount(12)
+                .verifyComplete();
+    }
+
+    /**
+     * flatMapSequential maintains order but it needs 6 sec as the serial execution.
+     */
+    @Test
+    public void transformUsingFlatMap_usingParallel_maintain_order_butFast() {
+        Flux<String> stringFlux = Flux.fromIterable(Arrays.asList("A", "B", "C", "D", "E", "F"))
+                .window(2)  //pass 2 elements instead one by one and returns Flux<Flux<String>>
+                .flatMapSequential(s -> {       //same operation as flatMap but it maintains order
+                    return s.map(this::convertToList)
+                            .subscribeOn(Schedulers.parallel())  //change a thread to another thread. All execution happens in parallel. returns a Flux<List<String>>
+                            .flatMap(Flux::fromIterable);        //Flux<String>
+                })
+                .log();
+
+        StepVerifier.create(stringFlux)
+                .expectNextCount(12)
                 .verifyComplete();
     }
 }
