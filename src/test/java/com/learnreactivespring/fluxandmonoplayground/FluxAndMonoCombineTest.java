@@ -52,6 +52,10 @@ public class FluxAndMonoCombineTest {
                 .verifyComplete();
     }
 
+    /**
+     * Check VirtualTimeTest.java
+     * This test is optimized in order not to take 6 sec to complete
+     */
     @Test
     public void combineUsingConcat_withDelay() {
         //Maybe you want to do 2 different external calls to DBs or external services and then combine the results.
