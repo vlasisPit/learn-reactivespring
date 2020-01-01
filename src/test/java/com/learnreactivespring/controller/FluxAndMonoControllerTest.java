@@ -96,4 +96,25 @@ public class FluxAndMonoControllerTest {
                 });
     }
 
+    /**
+     * It is sufficient to check the first 3 elements, that's why we cancel the
+     * subscription (because the flux is infinite)
+     */
+    @Test
+    public void fluxStream() {
+        Flux<Long> longStreamFlux = webTestClient.get()     //GET call to the endpoint
+                .uri("/fluxstream-infinite")
+                .accept(MediaType.APPLICATION_STREAM_JSON)      //!!!!!!!!!!!!!!! SOS
+                .exchange()     //actual call to the endpoint
+                .expectStatus().isOk()
+                .returnResult(Long.class)
+                .getResponseBody();
+
+        StepVerifier.create(longStreamFlux)
+                .expectNext(0L)
+                .expectNext(1L)
+                .expectNext(2L)
+                .thenCancel()
+                .verify();
+    }
 }

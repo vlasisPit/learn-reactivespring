@@ -30,4 +30,15 @@ public class FluxAndMonoController {
                 .log();
     }
 
+    /**
+     * Create an infinite stream
+     * This is a cold publisher !!!!!!!!!!!!
+     * @return
+     */
+    @GetMapping(value = "/fluxstream-infinite", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
+    public Flux<Long> returnFluxStreamInfinite() {
+        return Flux.interval(Duration.ofSeconds(1))
+                .log();
+    }
+
 }
