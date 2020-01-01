@@ -117,4 +117,25 @@ public class FluxAndMonoControllerTest {
                 .thenCancel()
                 .verify();
     }
+
+    /**
+     * We can use Mono when you are requesting for one single resource and you want the resource in a
+     * non-blocking way.
+     */
+    @Test
+    public void mono() {
+        Integer expected = 1;
+
+        webTestClient.get()
+                .uri("/mono")
+                .accept(MediaType.APPLICATION_JSON_UTF8)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Integer.class)
+                .consumeWith(response -> {
+                    assertEquals(expected, response.getResponseBody());
+                });
+    }
+
+
 }
