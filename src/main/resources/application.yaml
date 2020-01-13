@@ -1,0 +1,27 @@
+spring:
+  profiles:
+    active: dev #default value
+---
+spring:
+  profiles: dev
+  data:
+    mongodb:
+      host: 192.168.56.2
+      port: 27017
+      database: local
+---
+spring:
+  profiles: nonprod
+  data:
+    mongodb:
+      host: 192.168.56.2
+      port: 27017
+      database: local
+---
+spring:
+  profiles: prod
+  data:
+    mongodb:
+      host: 192.168.56.2
+      port: 27017
+      database: local
