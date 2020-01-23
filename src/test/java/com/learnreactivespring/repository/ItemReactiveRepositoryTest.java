@@ -1,7 +1,7 @@
 package com.learnreactivespring.repository;
 
 import com.learnreactivespring.document.Item;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,7 +32,7 @@ public class ItemReactiveRepositoryTest {
             new Item("ABC", "Bose Headphones", 149.99)
     );
 
-    @BeforeAll
+    @BeforeEach
     public void setUp() {
         itemReactiveRepository.deleteAll()
                 .thenMany(Flux.fromIterable(itemList))
