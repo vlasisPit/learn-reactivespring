@@ -2,7 +2,7 @@ package com.learnreactivespring.repository;
 
 import com.learnreactivespring.document.Item;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
-import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Execute all necessary mongoDB actions
@@ -19,5 +19,5 @@ public interface ItemReactiveRepository extends ReactiveMongoRepository<Item, St
       * The correlation is done by the name of the method eg findByDescription
       * If the method name is findByDescrion, this will not work
       */
-      Flux<Item> findByDescription(String description);
+      Mono<Item> findByDescription(String description);
 }
