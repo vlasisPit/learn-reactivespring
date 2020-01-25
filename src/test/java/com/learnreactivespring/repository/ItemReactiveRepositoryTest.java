@@ -7,6 +7,11 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Profile;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -15,9 +20,16 @@ import reactor.test.StepVerifier;
 import java.util.Arrays;
 import java.util.List;
 
-@DataMongoTest      //It will load only the necessary classes to test the mongoDB Application
-@ExtendWith(SpringExtension.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+/**
+ * ONLY FOR TESTING A REAL (NOT-EMBEDDED MONGODB)
+ * It will load only the necessary classes to test the mongoDB Application
+ * This does not invoke all the application context. So, the CommandLineRunner
+ * is not triggered
+ */
+//@DataMongoTest
+@SpringBootTest
+@DirtiesContext
+@ActiveProfiles("test")
 public class ItemReactiveRepositoryTest {
 
     @Autowired

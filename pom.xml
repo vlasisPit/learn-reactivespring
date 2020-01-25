@@ -47,17 +47,17 @@
 		<!--Embedded MongoDB will provide a platform neutral way for running mongodb in unit tests.
 		In order for this to play, you need to stop mongo running container
 		and delete mongo related application properties from property files.-->
-		<!--<dependency>
+		<dependency>
 			<groupId>de.flapdoodle.embed</groupId>
 			<artifactId>de.flapdoodle.embed.mongo</artifactId>
 			<scope>test</scope>
-		</dependency>-->
-		<dependency>
+		</dependency>
+<!--		<dependency>
 			<groupId>com.github.fakemongo</groupId>
 			<artifactId>fongo</artifactId>
 			<version>2.1.1</version>
 			<scope>test</scope>
-		</dependency>
+		</dependency>-->
 		<dependency>
 			<groupId>io.projectreactor</groupId>
 			<artifactId>reactor-test</artifactId>
