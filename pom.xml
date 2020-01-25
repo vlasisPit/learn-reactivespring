@@ -44,7 +44,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<!--Embedded MongoDB will provide a platform neutral way for running mongodb in unittests.
+		<!--Embedded MongoDB will provide a platform neutral way for running mongodb in unit tests.
 		In order for this to play, you need to stop mongo running container
 		and delete mongo related application properties from property files.-->
 		<!--<dependency>
