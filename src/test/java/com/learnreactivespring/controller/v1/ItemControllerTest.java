@@ -1,6 +1,5 @@
 package com.learnreactivespring.controller.v1;
 
-import com.learnreactivespring.constants.ItemConstants;
 import com.learnreactivespring.document.Item;
 import com.learnreactivespring.repository.ItemReactiveRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +17,7 @@ import reactor.test.StepVerifier;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.learnreactivespring.constants.ItemConstants.ITEM_END_POINT_V1;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
@@ -56,7 +56,7 @@ public class ItemControllerTest {
     @Test
     public void getAllItems() {
         webTestClient.get()
-                .uri(ItemConstants.ITEM_END_POINT_V1)
+                .uri(ITEM_END_POINT_V1)
                 .exchange()     //connect to the endpoint
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -67,7 +67,7 @@ public class ItemControllerTest {
     @Test
     public void getAllItems_approach2() {
         webTestClient.get()
-                .uri(ItemConstants.ITEM_END_POINT_V1)
+                .uri(ITEM_END_POINT_V1)
                 .exchange()     //connect to the endpoint
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -84,7 +84,7 @@ public class ItemControllerTest {
     @Test
     public void getAllItems_approach3() {
         Flux<Item> itemsFlux = webTestClient.get()
-                .uri(ItemConstants.ITEM_END_POINT_V1)
+                .uri(ITEM_END_POINT_V1)
                 .exchange()     //connect to the endpoint
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -94,5 +94,23 @@ public class ItemControllerTest {
         StepVerifier.create(itemsFlux.log("Value from network : "))
                 .expectNextCount(4)
                 .verifyComplete();
+    }
+
+    @Test
+    public void getOneItem() {
+        webTestClient.get()
+                .uri(ITEM_END_POINT_V1.concat("/{id}"), "ABC")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.price", 149.99);
+    }
+
+    @Test
+    public void getOneItem_notFound() {
+        webTestClient.get()
+                .uri(ITEM_END_POINT_V1.concat("/{id}"), "DEF")
+                .exchange()
+                .expectStatus().isNotFound();
     }
 }
