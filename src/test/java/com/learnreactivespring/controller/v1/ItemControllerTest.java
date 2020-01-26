@@ -51,7 +51,7 @@ public class ItemControllerTest {
                 new Item(null, "Samsung TV", 399.99),
                 new Item(null, "LG TV", 329.99),
                 new Item(null, "Apple Watch", 349.99),
-                new Item("ABC", "Beats HeadPhones", 19.99)
+                new Item("ABC", "Beats HeadPhones", 149.99)
         );
     }
 
@@ -139,5 +139,33 @@ public class ItemControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(Void.class);
+    }
+
+    @Test
+    public void updateItem() {
+        double newPrice = 129.99;
+        Item item = new Item(null, "Beats HeadPhones", newPrice);
+        webTestClient.put()
+                .uri(ITEM_END_POINT_V1.concat("/{id}"), "ABC")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .body(Mono.just(item), Item.class)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.price", newPrice);
+    }
+
+    @Test
+    public void updateItem_notFound() {
+        double newPrice = 129.99;
+        Item item = new Item(null, "Beats HeadPhones", newPrice);
+        webTestClient.put()
+                .uri(ITEM_END_POINT_V1.concat("/{id}"), "DEF")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .body(Mono.just(item), Item.class)
+                .exchange()
+                .expectStatus().isNotFound();
     }
 }
