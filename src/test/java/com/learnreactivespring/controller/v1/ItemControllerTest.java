@@ -1,5 +1,6 @@
 package com.learnreactivespring.controller.v1;
 
+import com.learnreactivespring.constants.ItemConstants;
 import com.learnreactivespring.document.Item;
 import com.learnreactivespring.repository.ItemReactiveRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,6 +13,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.util.Arrays;
@@ -112,5 +114,20 @@ public class ItemControllerTest {
                 .uri(ITEM_END_POINT_V1.concat("/{id}"), "DEF")
                 .exchange()
                 .expectStatus().isNotFound();
+    }
+
+    @Test
+    public void createItem()  {
+        Item item = new Item(null, "Iphone X", 999.99);
+        webTestClient.post()
+                .uri(ITEM_END_POINT_V1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Mono.just(item), Item.class)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody()
+                .jsonPath("$.id").isNotEmpty()
+                .jsonPath("$.description").isEqualTo("Iphone X")
+                .jsonPath("$.price").isEqualTo(999.99);
     }
 }
