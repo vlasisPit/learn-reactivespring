@@ -18,6 +18,7 @@ public class ItemsRouter {
     @Bean
     public RouterFunction<ServerResponse> itemRoute(ItemsHandler itemsHandler) {
         return RouterFunctions
-                .route(GET(ITEM_FUNCTIONAL_END_POINT_V1).and(accept(MediaType.APPLICATION_JSON)), itemsHandler::getAllItems);
+                .route(GET(ITEM_FUNCTIONAL_END_POINT_V1).and(accept(MediaType.APPLICATION_JSON)), itemsHandler::getAllItems)
+                .andRoute(GET(ITEM_FUNCTIONAL_END_POINT_V1+"/{id}").and(accept(MediaType.APPLICATION_JSON)), itemsHandler::getOneItem);
     }
 }
