@@ -18,7 +18,6 @@ import reactor.test.StepVerifier;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.learnreactivespring.constants.ItemConstants.ITEM_END_POINT_V1;
 import static com.learnreactivespring.constants.ItemConstants.ITEM_FUNCTIONAL_END_POINT_V1;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -139,5 +138,33 @@ public class ItemHandlerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(Void.class);
+    }
+
+    @Test
+    public void updateItem() {
+        double newPrice = 129.99;
+        Item item = new Item(null, "Beats HeadPhones", newPrice);
+        webTestClient.put()
+                .uri(ITEM_FUNCTIONAL_END_POINT_V1.concat("/{id}"), "ABC")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .body(Mono.just(item), Item.class)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.price", newPrice);
+    }
+
+    @Test
+    public void updateItem_notFound() {
+        double newPrice = 129.99;
+        Item item = new Item(null, "Beats HeadPhones", newPrice);
+        webTestClient.put()
+                .uri(ITEM_FUNCTIONAL_END_POINT_V1.concat("/{id}"), "DEF")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .body(Mono.just(item), Item.class)
+                .exchange()
+                .expectStatus().isNotFound();
     }
 }
