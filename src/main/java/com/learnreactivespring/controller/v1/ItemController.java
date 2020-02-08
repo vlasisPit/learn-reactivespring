@@ -16,6 +16,12 @@ import static com.learnreactivespring.constants.ItemConstants.ITEM_END_POINT_V1;
 @Slf4j
 public class ItemController {
 
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
+        log.error("Exception caught in handleRuntimeException : ", ex);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+    }
+
     @Autowired
     ItemReactiveRepository itemReactiveRepository;
 
@@ -48,6 +54,15 @@ public class ItemController {
     @DeleteMapping(ITEM_END_POINT_V1+"/{id}")
     public Mono<Void> deleteItem(@PathVariable String id) {
         return itemReactiveRepository.deleteById(id);
+    }
+
+    /**
+     * Intentionally throw a runtime exception
+     */
+    @GetMapping(ITEM_END_POINT_V1 + "/runtimeException")
+    public Flux<Item> runtimeException() {
+        return itemReactiveRepository.findAll()
+                .concatWith(Mono.error(new RuntimeException("RuntimeException occurred.")));
     }
 
     /**
