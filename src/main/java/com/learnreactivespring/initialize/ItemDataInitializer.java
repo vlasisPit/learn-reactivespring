@@ -2,7 +2,9 @@ package com.learnreactivespring.initialize;
 
 import com.learnreactivespring.document.Item;
 import com.learnreactivespring.document.ItemCapped;
+import com.learnreactivespring.repository.ItemReactiveCappedRepository;
 import com.learnreactivespring.repository.ItemReactiveRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
@@ -11,6 +13,7 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 
@@ -18,11 +21,15 @@ import java.util.List;
  * Set this class to Component in order to be scanned during the application start up
  */
 @Component
+@Slf4j
 @Profile("!test")
 public class ItemDataInitializer implements CommandLineRunner {
 
     @Autowired
     ItemReactiveRepository itemReactiveRepository;
+
+    @Autowired
+    ItemReactiveCappedRepository itemReactiveCappedRepository;
 
     @Autowired
     MongoOperations mongoOperations;
@@ -31,6 +38,7 @@ public class ItemDataInitializer implements CommandLineRunner {
     public void run(String... args) throws Exception {
         initialDataSetUp();
         createCappedCollection();
+        dataSetupForCappedCollection();
     }
 
     /**
@@ -62,5 +70,14 @@ public class ItemDataInitializer implements CommandLineRunner {
                 new Item(null, "Apple Watch", 349.99),
                 new Item("ABC", "Beats HeadPhones", 19.99)
         );
+    }
+
+    public void dataSetupForCappedCollection() {
+        Flux<ItemCapped> itemCappedFlux = Flux.interval(Duration.ofSeconds(1))    //emit 1,2,3,4... every second
+                .map(i -> new ItemCapped(null, "Random item " + i, (100.00 + i)));
+
+        //subscribe to flux and save each ItemCapped
+        itemReactiveCappedRepository.insert(itemCappedFlux)
+                .subscribe(itemCapped -> log.info("Inserted item is " + itemCapped)); //print each saved itemCapped
     }
 }
