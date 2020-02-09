@@ -1,6 +1,5 @@
 package com.learnreactivespring.controller.v1;
 
-import com.learnreactivespring.constants.ItemConstants;
 import com.learnreactivespring.document.Item;
 import com.learnreactivespring.repository.ItemReactiveRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -167,5 +166,15 @@ public class ItemControllerTest {
                 .body(Mono.just(item), Item.class)
                 .exchange()
                 .expectStatus().isNotFound();
+    }
+
+    @Test
+    public void runTimeException() {
+        webTestClient.get()
+                .uri(ITEM_END_POINT_V1+"/runtimeException")
+                .exchange()
+                .expectStatus().is5xxServerError()
+                .expectBody(String.class)
+                .isEqualTo("RuntimeException occurred.");
     }
 }
