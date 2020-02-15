@@ -15,7 +15,7 @@ import reactor.core.publisher.Flux;
  */
 public interface ItemReactiveCappedRepository extends ReactiveMongoRepository<ItemCapped, String> {
 
-    @Tailable
+    @Tailable       //gives us the streaming capability
     Flux<ItemCapped> findItemsBy();
 
 }
